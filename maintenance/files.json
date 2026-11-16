@@ -1,0 +1,14 @@
+[
+  {
+    "path": "data/tests/large.db",
+    "bytes": 177152000,
+    "sha256": "ed397f11271f5239701bb80413859369a0795a242cda0829839dfd2aafdf3fec",
+    "transport": "maintenance/large.db.xz"
+  },
+  {
+    "path": "data/tests/large.out.db",
+    "bytes": 155770880,
+    "sha256": "12ba749cd80d26844c478ec7042de8eedd347442496ec4140de480ca18b1928b",
+    "transport": "maintenance/large.out.db.xz"
+  }
+]

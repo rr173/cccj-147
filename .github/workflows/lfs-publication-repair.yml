@@ -1,0 +1,36 @@
+name: cccj-147 task 1 approved LFS publication repair
+'on':
+  push:
+    branches: [maintenance/cccj-147-001-lfs-20261116t235447]
+permissions:
+  contents: write
+jobs:
+  exact-lfs-objects:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+          fetch-depth: 1
+      - name: Restore and hash-check original database bytes
+        run: python3 maintenance/restore-exact.py
+      - name: Upload only approved LFS objects
+        run: git lfs push --object-id origin ed397f11271f5239701bb80413859369a0795a242cda0829839dfd2aafdf3fec 12ba749cd80d26844c478ec7042de8eedd347442496ec4140de480ca18b1928b
+      - name: Fetch published LFS commit
+        shell: bash
+        run: |
+          git init /tmp/cccj-147-lfs-readback
+          git -C /tmp/cccj-147-lfs-readback remote add origin https://github.com/rr173/cccj-147.git
+          git -C /tmp/cccj-147-lfs-readback fetch --no-tags origin 3f230e4a44574ce85c4025c822802cff1f68d0b0:refs/remotes/origin/pointwise-artifact
+          test "$(git -C /tmp/cccj-147-lfs-readback rev-parse 3f230e4a44574ce85c4025c822802cff1f68d0b0^)" = 863d73236dbcd7842b3fbcb52ccee54d5f487cc3
+      - name: Download and verify published LFS objects
+        shell: bash
+        working-directory: /tmp/cccj-147-lfs-readback
+        run: |
+          git lfs fetch origin refs/remotes/origin/pointwise-artifact
+          python3 "$GITHUB_WORKSPACE/maintenance/verify-remote.py"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lfs-readback
+          path: /tmp/cccj-147-lfs-readback/lfs-readback.json
